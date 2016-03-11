@@ -24,7 +24,8 @@ class TaskTests: XCTestCase {
             return {}
         }
 
-        task.onUpdate {
+        task
+            .onUpdate {
                 retVal = $0
             }
             .onCompletion {
@@ -49,7 +50,8 @@ class TaskTests: XCTestCase {
         var isCompleted = false
         var error: NSError? = nil
 
-        task.onUpdate { _ in
+        task
+            .onUpdate { _ in
                 onUpdateCnt++
             }
             .onFailure {
@@ -80,7 +82,8 @@ class TaskTests: XCTestCase {
         var retVal: String?
         var onUpdateCnt = 0
 
-        task.onUpdate {
+        task
+            .onUpdate {
                 onUpdateCnt++
                 retVal = $0
             }
@@ -102,7 +105,8 @@ class TaskTests: XCTestCase {
 
         var onCompletionCount = 0
 
-        task.onCompletion {
+        task
+            .onCompletion {
                 onCompletionCount++
             }
             .start()
@@ -113,6 +117,32 @@ class TaskTests: XCTestCase {
 
         XCTAssertEqual(invocationCount, 1)
         XCTAssertEqual(onCompletionCount, 1)
+    }
+
+    func test_createWithResult() {
+        let task = Task<String, NSError>(value: "Test")
+        var ret: String?
+
+        task
+            .onUpdate {
+                ret = $0
+            }
+            .start()
+
+        XCTAssertEqual(ret, "Test")
+    }
+
+    func test_createWithError() {
+        let task = Task<String, NSError>(error: NSError(domain: "test", code: 404, userInfo: nil))
+        var ret: NSError?
+
+        task
+            .onFailure {
+                ret = $0
+            }
+            .start()
+
+        XCTAssertEqual(ret, NSError(domain: "test", code: 404, userInfo: nil))
     }
     
 }
