@@ -1,0 +1,14 @@
+PODS:
+  - Chop (0.1.0)
+
+DEPENDENCIES:
+  - Chop (from `../`)
+
+EXTERNAL SOURCES:
+  Chop:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Chop: 8260209e554c1be081a56c51c1d138a12939a2d4
+
+COCOAPODS: 0.39.0
