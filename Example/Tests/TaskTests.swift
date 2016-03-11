@@ -1,17 +1,9 @@
-import UIKit
+
 import XCTest
 import Chop
 
-class TaskTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-    }
-    
-    override func tearDown() {
-        super.tearDown()
-    }
-    
+class Tests: XCTestCase {
+
     func test_successFlow() {
         var invocationCount = 0
         var isCompleted = false
@@ -24,6 +16,8 @@ class TaskTests: XCTestCase {
             return {}
         }
 
+        let group = TaskGroup()
+
         task
             .onUpdate {
                 retVal = $0
@@ -31,7 +25,7 @@ class TaskTests: XCTestCase {
             .onCompletion {
                 isCompleted = true
             }
-            .start()
+            .registerIn(group)
 
         XCTAssertTrue(isCompleted)
         XCTAssertEqual(invocationCount, 1)
@@ -50,6 +44,8 @@ class TaskTests: XCTestCase {
         var isCompleted = false
         var error: NSError? = nil
 
+        let group = TaskGroup()
+
         task
             .onUpdate { _ in
                 onUpdateCnt++
@@ -61,7 +57,7 @@ class TaskTests: XCTestCase {
             .onCompletion {
                 isCompleted = true
             }
-            .start()
+            .registerIn(group)
 
         XCTAssertTrue(isCompleted)
         XCTAssertEqual(onUpdateCnt, 0)
@@ -82,12 +78,14 @@ class TaskTests: XCTestCase {
         var retVal: String?
         var onUpdateCnt = 0
 
+        let group = TaskGroup()
+
         task
             .onUpdate {
                 onUpdateCnt++
                 retVal = $0
             }
-            .start()
+            .registerIn(group)
 
         XCTAssertEqual(onUpdateCnt, 3)
         XCTAssertEqual(retVal, "Doin'?")
@@ -104,12 +102,13 @@ class TaskTests: XCTestCase {
         }
 
         var onCompletionCount = 0
+        let group = TaskGroup()
 
         task
             .onCompletion {
                 onCompletionCount++
             }
-            .start()
+            .registerIn(group)
 
         task.start()
         task.start()
@@ -123,11 +122,13 @@ class TaskTests: XCTestCase {
         let task = Task<String, NSError>(value: "Test")
         var ret: String?
 
+        let group = TaskGroup()
+
         task
             .onUpdate {
                 ret = $0
             }
-            .start()
+            .registerIn(group)
 
         XCTAssertEqual(ret, "Test")
     }
@@ -136,11 +137,13 @@ class TaskTests: XCTestCase {
         let task = Task<String, NSError>(error: NSError(domain: "test", code: 404, userInfo: nil))
         var ret: NSError?
 
+        let group = TaskGroup()
+
         task
             .onFailure {
                 ret = $0
             }
-            .start()
+            .registerIn(group)
 
         XCTAssertEqual(ret, NSError(domain: "test", code: 404, userInfo: nil))
     }
