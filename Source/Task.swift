@@ -39,6 +39,9 @@ public final class Task<Value, Error> : TaskType {
     /// The handler that disposes of the task when it is not needed anymore.
     private var disposeHandler: DisposeType?
 
+    /// Whether the task is finished.
+    private var finished: Bool = false
+
 
     //////////////////////////////////////////////////
     // Init / Deinit
@@ -82,6 +85,10 @@ public final class Task<Value, Error> : TaskType {
         }
     }
 
+    public func isFinished() -> Bool {
+        return finished
+    }
+
     private func propagate(event: EventType) {
         for sub in self.subscriptions {
             sub(event)
@@ -90,6 +97,8 @@ public final class Task<Value, Error> : TaskType {
         switch event {
         case .Failure(_):
             self.propagate(.Completion)
+        case .Completion:
+            finished = true
         default:
             break;
         }

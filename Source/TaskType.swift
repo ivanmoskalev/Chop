@@ -12,6 +12,10 @@ import Foundation
 
 /// A protocol defining the basic interface of an asynchronous task.
 public protocol TaskType {
+
     /// Starts the execution of a task.
     func start()
+
+    /// Returns whether the task is finished.
+    func isFinished() -> Bool
 }

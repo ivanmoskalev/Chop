@@ -63,6 +63,7 @@ public final class TaskGroup : TaskType {
     - parameter taskId: Optional. The identifier of this task. Default value is an UUID string.
     */
     public func register(task: TaskType, taskId: String = NSUUID().UUIDString) {
+        removeFinished()
         if policy == .Replace || tasks[taskId] == nil {
             tasks[taskId] = task
             if startsImmediately { task.start() }
@@ -81,6 +82,20 @@ public final class TaskGroup : TaskType {
     public func start() {
         for (_, task) in tasks {
             task.start()
+        }
+    }
+
+    public func isFinished() -> Bool {
+        return false
+    }
+
+
+    //////////////////////////////////////////////////
+    // Private
+
+    private func removeFinished() {
+        for (key, task) in tasks where task.isFinished() {
+            tasks[key] = nil
         }
     }
 

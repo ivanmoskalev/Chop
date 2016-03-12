@@ -21,7 +21,7 @@ class TaskGroupTests: XCTestCase {
 
         Task<Int, NSError> {
             taskOneExecutionCnt++
-            $0(.Completion)
+            $0(.Update(value: 1))
             return {}
         }
         .registerIn(group, taskId: "task")
