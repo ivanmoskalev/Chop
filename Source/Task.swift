@@ -86,6 +86,13 @@ public final class Task<Value, Error> : TaskType {
         for sub in self.subscriptions {
             sub(event)
         }
+
+        switch event {
+        case .Failure(_):
+            self.propagate(.Completion)
+        default:
+            break;
+        }
     }
 
 
