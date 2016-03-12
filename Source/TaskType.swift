@@ -19,3 +19,7 @@ public protocol TaskType {
     /// Returns whether the task is finished.
     func isFinished() -> Bool
 }
+
+internal protocol CompletionSubscribable {
+    func onCompletion(sub: Void -> Void)
+}

@@ -66,6 +66,7 @@ public final class TaskGroup : TaskType {
         removeFinished()
         if policy == .Replace || tasks[taskId] == nil {
             tasks[taskId] = task
+            subscribeToCompletion(task)
             if startsImmediately { task.start() }
         }
     }
@@ -99,6 +100,14 @@ public final class TaskGroup : TaskType {
     private func removeFinished() {
         for (key, task) in tasks where task.isFinished() {
             tasks[key] = nil
+        }
+    }
+
+    private func subscribeToCompletion(task: TaskType) {
+        if let task = task as? CompletionSubscribable {
+            task.onCompletion {
+                self.removeFinished()
+            }
         }
     }
 

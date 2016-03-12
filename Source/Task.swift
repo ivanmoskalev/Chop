@@ -138,17 +138,28 @@ public final class Task<Value, Error> : TaskType {
      - parameter event: The event which should be handled.
      */
     private func propagate(event: EventType) {
+        markFinishedIfCompletion(event)
         for sub in self.subscriptions {
             sub(event)
         }
+        propagateCompletionIfFailure(event)
+    }
 
+    private func propagateCompletionIfFailure(event: EventType) {
         switch event {
         case .Failure(_):
             self.propagate(.Completion)
-        case .Completion:
-            finished = true
         default:
-            break;
+            break
+        }
+    }
+
+    private func markFinishedIfCompletion(event: EventType) {
+        switch event {
+        case .Completion:
+            self.finished = true
+        default:
+            break
         }
     }
 
@@ -209,4 +220,16 @@ public final class Task<Value, Error> : TaskType {
             }
         }
     }
+}
+
+
+//////////////////////////////////////////////////
+// Internal
+
+extension Task : CompletionSubscribable {
+
+    internal func onCompletion(sub: Void -> Void) {
+        let _ : Task<Value, Error> = self.onCompletion(sub)
+    }
+
 }
