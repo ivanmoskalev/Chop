@@ -7,7 +7,7 @@ podfile: Example/Podfile
 install:
  - gem install xcpretty
  - gem install cocoapods # Since Travis is not always on latest version
- - pod install --project-directory=Example
+ - pod install --no-repo-update --project-directory=Example
  
 script:
  - set -o pipefail && xcodebuild test -workspace Example/Chop.xcworkspace -scheme Chop-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=YES | xcpretty
