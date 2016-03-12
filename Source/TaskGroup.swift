@@ -105,8 +105,8 @@ public final class TaskGroup : TaskType {
 
     private func subscribeToCompletion(task: TaskType) {
         if let task = task as? CompletionSubscribable {
-            task.onCompletion {
-                self.removeFinished()
+            task.onCompletion { [weak self] in
+                self?.removeFinished()
             }
         }
     }
