@@ -15,6 +15,7 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* TaskTests.swift */; };
 		734BFB60172E0D4BDB7B2D43 /* Pods_Chop_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0D89633D10643B971E30960 /* Pods_Chop_Tests.framework */; };
+		DF6AA5B71C940DC30032998D /* TaskGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF6AA5B51C940D7D0032998D /* TaskGroupTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		C8813D7D4362E59058EA79CD /* Pods-Chop_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chop_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-Chop_Example/Pods-Chop_Example.release.xcconfig"; sourceTree = "<group>"; };
 		D07CFB7B5926F213FDAA091F /* Chop.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Chop.podspec; path = ../Chop.podspec; sourceTree = "<group>"; };
 		DC02919535C37ABE6E3F4EB3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		DF6AA5B51C940D7D0032998D /* TaskGroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskGroupTests.swift; sourceTree = "<group>"; };
 		E8CD2E9D67F0177C08CFA1BB /* Pods-Chop_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chop_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Chop_Tests/Pods-Chop_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		F7A48E67AFD119DED50FA008 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACEB1AFB9204008FA782 /* TaskTests.swift */,
+				DF6AA5B51C940D7D0032998D /* TaskGroupTests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -368,6 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF6AA5B71C940DC30032998D /* TaskGroupTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* TaskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

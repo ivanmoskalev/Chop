@@ -1,10 +1,22 @@
-
 import XCTest
 import Chop
 
-class Tests: XCTestCase {
+class TaskTests: XCTestCase {
 
-    func test_successFlow() {
+    var group: TaskGroup!
+
+    override func setUp() {
+        super.setUp()
+        group = TaskGroup()
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        group = nil
+    }
+
+
+    func test_SuccessFlow() {
         var invocationCount = 0
         var isCompleted = false
         var retVal = 0
@@ -15,8 +27,6 @@ class Tests: XCTestCase {
             handler(.Completion)
             return {}
         }
-
-        let group = TaskGroup()
 
         task
             .onUpdate {
@@ -32,7 +42,7 @@ class Tests: XCTestCase {
         XCTAssertEqual(retVal, 42)
     }
 
-    func test_failureFlow() {
+    func test_FailureFlow() {
         let task = Task<Int, NSError> { handler in
             handler(.Failure(error: NSError(domain: "test", code: 100, userInfo: nil)))
             handler(.Completion)
@@ -43,8 +53,6 @@ class Tests: XCTestCase {
         var onFailureCnt = 0
         var isCompleted = false
         var error: NSError? = nil
-
-        let group = TaskGroup()
 
         task
             .onUpdate { _ in
@@ -65,7 +73,7 @@ class Tests: XCTestCase {
         XCTAssertEqual(error?.code, 100)
     }
 
-    func test_onMultipleUpdates_shouldSaveLastValue() {
+    func test_OnMultipleUpdates_shouldSaveLastValue() {
 
         let task = Task<String, NSError> { handler in
             handler(.Update(value: "How"))
@@ -78,8 +86,6 @@ class Tests: XCTestCase {
         var retVal: String?
         var onUpdateCnt = 0
 
-        let group = TaskGroup()
-
         task
             .onUpdate {
                 onUpdateCnt++
@@ -91,7 +97,7 @@ class Tests: XCTestCase {
         XCTAssertEqual(retVal, "Doin'?")
     }
 
-    func test_shouldStartOnlyOnce() {
+    func test_ShouldStartOnlyOnce() {
 
         var invocationCount = 0
 
@@ -102,7 +108,6 @@ class Tests: XCTestCase {
         }
 
         var onCompletionCount = 0
-        let group = TaskGroup()
 
         task
             .onCompletion {
@@ -118,11 +123,9 @@ class Tests: XCTestCase {
         XCTAssertEqual(onCompletionCount, 1)
     }
 
-    func test_createWithResult() {
+    func test_CreateWithResult() {
         let task = Task<String, NSError>(value: "Test")
         var ret: String?
-
-        let group = TaskGroup()
 
         task
             .onUpdate {
@@ -133,11 +136,9 @@ class Tests: XCTestCase {
         XCTAssertEqual(ret, "Test")
     }
 
-    func test_createWithError() {
+    func test_CreateWithError() {
         let task = Task<String, NSError>(error: NSError(domain: "test", code: 404, userInfo: nil))
         var ret: NSError?
-
-        let group = TaskGroup()
 
         task
             .onFailure {
