@@ -93,6 +93,9 @@ public final class TaskGroup : TaskType {
     //////////////////////////////////////////////////
     // Private
 
+    /**
+    Removes all tasks that are finished, freeing up the resources.
+    */
     private func removeFinished() {
         for (key, task) in tasks where task.isFinished() {
             tasks[key] = nil

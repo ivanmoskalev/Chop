@@ -64,4 +64,39 @@ class TaskGroupTests: XCTestCase {
         XCTAssertEqual(taskTwoExecutionCnt, 1)
     }
 
+    func test_DeferredStart() {
+
+        group = TaskGroup(startsImmediately: false)
+
+        var taskOneExecutionCnt = 0
+
+        Task<Int, NSError> {
+            taskOneExecutionCnt++
+            $0(.Update(value: 1))
+            return {}
+        }
+        .registerIn(group)
+
+        var taskTwoExecutionCnt = 0
+
+        Task<Int, NSError> {
+            taskTwoExecutionCnt++
+            $0(.Completion)
+            return {}
+        }
+        .registerIn(group)
+
+        XCTAssertEqual(taskOneExecutionCnt, 0)
+        XCTAssertEqual(taskTwoExecutionCnt, 0)
+
+        group.start()
+
+        XCTAssertEqual(taskOneExecutionCnt, 1)
+        XCTAssertEqual(taskTwoExecutionCnt, 1)
+    }
+
+    func test_IsFinished_ShouldAlwaysReturnFalse() {
+        XCTAssertEqual(group.isFinished(), false)
+    }
+
 }
