@@ -18,7 +18,7 @@ let taskGroup = TaskGroup(policy: .Ignore)  // The context in which the tasks ca
 
 self.isLoading = true
 self.interactor
-    .fetchIssues(request, itemLimit: 10, progressive: true) // API that  
+    .fetchIssues(request, itemLimit: 10, progressive: true) // API that exposes a Chop'esque interface.
     .onUpdate {
       // Can be executed multiple times (ie., providing first cached items, then remote items).
       self.items = $0
