@@ -166,4 +166,22 @@ extension Task {
         }
     }
 
+    @warn_unused_result
+    public func recover(transform: Error -> Value) -> Task<Value, Error> {
+        return Task<Value, Error> { handler in
+            var task: Task? = self.on { event in
+                switch event {
+                case .Update(let value):
+                    handler(.Update(value: value))
+                case .Failure(let error):
+                    handler(.Update(value: transform(error)))
+                case .Completion:
+                    handler(.Completion)
+                }
+            }
+            task?.start()
+            return { task = nil }
+        }
+    }
+
 }

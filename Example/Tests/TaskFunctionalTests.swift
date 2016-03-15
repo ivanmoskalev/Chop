@@ -28,4 +28,17 @@ class TaskFunctionalTests: XCTestCase {
         XCTAssertEqual(ret, "Test number one")
     }
 
+    func test_Recover() {
+        var ret: String?
+
+        Task<String, NSError>(error: NSError(domain: "test", code: 42, userInfo: nil))
+            .recover({ "Error with code: \($0.code)" })
+            .onUpdate {
+                ret = $0
+            }
+            .registerIn(group)
+
+        XCTAssertEqual(ret, "Error with code: 42")
+    }
+
 }
