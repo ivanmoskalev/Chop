@@ -148,5 +148,4 @@ class TaskTests: XCTestCase {
 
         XCTAssertEqual(ret, NSError(domain: "test", code: 404, userInfo: nil))
     }
-    
 }
