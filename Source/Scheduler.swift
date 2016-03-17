@@ -11,7 +11,7 @@
 import Foundation
 
 public enum Scheduler {
-    case ImmediateMain
+    case Main
     case Background
 }
 
@@ -23,14 +23,14 @@ internal extension Scheduler {
 
     func perform(block: dispatch_block_t) {
         switch self {
-        case .ImmediateMain:
-            performImmediateMain(block)
+        case .Main:
+            dispatchMain(block)
         case .Background:
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), block)
         }
     }
 
-    func performImmediateMain(block: dispatch_block_t) {
+    func dispatchMain(block: dispatch_block_t) {
         if NSThread.isMainThread() {
             block()
             return

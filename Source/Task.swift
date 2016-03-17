@@ -285,7 +285,7 @@ extension Task {
 extension Task {
 
     @warn_unused_result
-    public func callbackOn(on scheduler: Scheduler) -> Task<Value, Error> {
+    public func switchTo(scheduler: Scheduler) -> Task<Value, Error> {
         return Task<Value, Error> { handler in
             var task: Task<Value, Error>? = self.on { event in
                 scheduler.perform {
