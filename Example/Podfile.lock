@@ -1,5 +1,5 @@
 PODS:
-  - Chop (0.1.0)
+  - Chop (0.1.1)
 
 DEPENDENCIES:
   - Chop (from `../`)
@@ -9,6 +9,6 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Chop: 8260209e554c1be081a56c51c1d138a12939a2d4
+  Chop: c93deb3718bce3f37bc9622df67220b1c8e23198
 
 COCOAPODS: 0.39.0
