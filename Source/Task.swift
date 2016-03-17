@@ -277,3 +277,24 @@ extension Task {
     }
 
 }
+
+
+//////////////////////////////////////////////////
+// Threading
+
+extension Task {
+
+    @warn_unused_result
+    public func callbackOn(on scheduler: Scheduler) -> Task<Value, Error> {
+        return Task<Value, Error> { handler in
+            var task: Task<Value, Error>? = self.on { event in
+                scheduler.perform {
+                    handler(event)
+                }
+            }
+            task?.start()
+            return { task = nil }
+        }
+    }
+    
+}
