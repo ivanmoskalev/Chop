@@ -28,6 +28,21 @@ class TaskFunctionalTests: XCTestCase {
         XCTAssertEqual(ret, "Test number one")
     }
 
+    func test_FlatMap() {
+        var ret: Int?
+
+        Task<String, NSError>(value: "Test")
+            .flatMap {
+                return Task<Int, NSError>(value: $0.hash)
+            }
+            .onUpdate {
+                ret = $0
+            }
+            .registerIn(group)
+
+        XCTAssertEqual(ret, "Test".hash)
+    }
+
     func test_Recover() {
         var ret: String?
 
