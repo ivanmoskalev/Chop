@@ -242,20 +242,7 @@ extension Task {
 
     @warn_unused_result
     public func map<T>(transform: Value -> T) -> Task<T, Error> {
-        return Task<T, Error> { handler in
-            var task: Task? = self.on { event in
-                switch event {
-                case .Update(let value):
-                    handler(.Update(value: transform(value)))
-                case .Failure(let error):
-                    handler(.Failure(error: error))
-                case .Completion:
-                    handler(.Completion)
-                }
-            }
-            task?.start()
-            return { task = nil }
-        }
+        return flatMap { Task<T, Error>(value: transform($0)) }
     }
 
     @warn_unused_result
