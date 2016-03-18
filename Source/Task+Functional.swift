@@ -13,12 +13,12 @@ import Foundation
 extension Task {
 
     @warn_unused_result
-    public func map<T>(transform: Value -> T) -> Task<T, Error> {
-        return flatMap { Task<T, Error>(value: transform($0)) }
+    public func then<T>(transform: Value -> T) -> Task<T, Error> {
+        return then { Task<T, Error>(value: transform($0)) }
     }
 
     @warn_unused_result
-    public func flatMap<T>(transform: Value -> Task<T, Error>) -> Task<T, Error> {
+    public func then<T>(transform: Value -> Task<T, Error>) -> Task<T, Error> {
         return Task<T, Error> { handler in
             var task: Task<Value, Error>?
             var producedTask: Task<T, Error>?

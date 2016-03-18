@@ -19,7 +19,7 @@ class TaskFunctionalTests: XCTestCase {
         var ret: String?
 
         Task<String, NSError>(value: "Test")
-            .map { $0 + " number one" }
+            .then { $0 + " number one" }
             .onUpdate {
                 ret = $0
             }
@@ -32,7 +32,7 @@ class TaskFunctionalTests: XCTestCase {
         var ret: Int?
 
         Task<String, NSError>(value: "Test")
-            .flatMap {
+            .then {
                 return Task<Int, NSError>(value: $0.hash)
             }
             .onUpdate {
