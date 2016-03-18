@@ -8,20 +8,6 @@
 // See the LICENSE file for details.
 //
 
-import Foundation
-
-/**
- The events that can be dispatched by the task.
- */
-public enum Event<V, E> {
-    /// An update to yielded value. This can be a final or a non-final update.
-    case Update(value: V)
-    /// A faiulre. Automatically triggers `.Completion` after being dispatched.
-    case Failure(error: E)
-    /// The completion – it means that the task is finished and can be disposed of.
-    case Completion
-}
-
 public final class Task<Value, Error> : TaskType {
 
     /// The type of Event that can occur.
@@ -72,7 +58,7 @@ public final class Task<Value, Error> : TaskType {
      */
     public convenience init(value: Value) {
         self.init {
-            $0(.Update(value: value)); $0(.Completion); return {}
+            $0(.Update(value)); $0(.Completion); return {}
         }
     }
 
@@ -85,7 +71,7 @@ public final class Task<Value, Error> : TaskType {
      */
     public convenience init(error: Error) {
         self.init {
-            $0(.Failure(error: error)); return {}
+            $0(.Failure(error)); return {}
         }
     }
 
@@ -232,77 +218,4 @@ extension Task : CompletionSubscribable {
         let _ : Task<Value, Error> = self.onCompletion(sub)
     }
 
-}
-
-
-//////////////////////////////////////////////////
-// Functional
-
-extension Task {
-
-    @warn_unused_result
-    public func map<T>(transform: Value -> T) -> Task<T, Error> {
-        return flatMap { Task<T, Error>(value: transform($0)) }
-    }
-
-    @warn_unused_result
-    public func flatMap<T>(transform: Value -> Task<T, Error>) -> Task<T, Error> {
-        return Task<T, Error> { handler in
-            var task: Task<Value, Error>?
-            var producedTask: Task<T, Error>?
-            task = self.on { event in
-                switch event {
-                case .Update(let value):
-                    producedTask = transform(value).on { handler($0) }
-                    producedTask?.start()
-                case .Failure(let error):
-                    handler(.Failure(error: error))
-                case .Completion:
-                    handler(.Completion)
-                }
-            }
-            task?.start()
-            return { task = nil; producedTask = nil }
-        }
-    }
-
-    @warn_unused_result
-    public func recover(transform: Error -> Value) -> Task<Value, Error> {
-        return Task<Value, Error> { handler in
-            var task: Task? = self.on { event in
-                switch event {
-                case .Update(let value):
-                    handler(.Update(value: value))
-                case .Failure(let error):
-                    handler(.Update(value: transform(error)))
-                case .Completion:
-                    handler(.Completion)
-                }
-            }
-            task?.start()
-            return { task = nil }
-        }
-    }
-
-}
-
-
-//////////////////////////////////////////////////
-// Threading
-
-extension Task {
-
-    @warn_unused_result
-    public func switchTo(scheduler: Scheduler) -> Task<Value, Error> {
-        return Task<Value, Error> { handler in
-            var task: Task<Value, Error>? = self.on { event in
-                scheduler.perform {
-                    handler(event)
-                }
-            }
-            task?.start()
-            return { task = nil }
-        }
-    }
-    
 }

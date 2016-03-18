@@ -23,7 +23,7 @@ class TaskTests: XCTestCase {
 
         let task = Task<Int, NSError> { handler in
             invocationCount++;
-            handler(.Update(value: 42))
+            handler(.Update(42))
             handler(.Completion)
             return {}
         }
@@ -44,7 +44,7 @@ class TaskTests: XCTestCase {
 
     func test_FailureFlow() {
         let task = Task<Int, NSError> { handler in
-            handler(.Failure(error: NSError(domain: "test", code: 100, userInfo: nil)))
+            handler(.Failure(NSError(domain: "test", code: 100, userInfo: nil)))
             handler(.Completion)
             return {}
         }
@@ -76,9 +76,9 @@ class TaskTests: XCTestCase {
     func test_OnMultipleUpdates_shouldSaveLastValue() {
 
         let task = Task<String, NSError> { handler in
-            handler(.Update(value: "How"))
-            handler(.Update(value: "You"))
-            handler(.Update(value: "Doin'?"))
+            handler(.Update("How"))
+            handler(.Update("You"))
+            handler(.Update("Doin'?"))
             handler(.Completion)
             return {}
         }
