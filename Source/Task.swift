@@ -109,6 +109,11 @@ public final class Task<Value, Error> : TaskType {
         }
     }
 
+    public func cancel() {
+        finished = true
+        disposeHandler?()
+    }
+
     /**
      Inherited from `TaskType`.
 

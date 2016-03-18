@@ -90,6 +90,12 @@ public final class TaskGroup : TaskType {
         return false
     }
 
+    public func cancel() {
+        for (_, task) in tasks {
+            task.cancel()
+        }
+    }
+
 
     //////////////////////////////////////////////////
     // Private
