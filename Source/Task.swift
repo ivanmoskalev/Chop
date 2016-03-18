@@ -8,8 +8,6 @@
 // See the LICENSE file for details.
 //
 
-import Foundation
-
 public final class Task<Value, Error> : TaskType {
 
     /// The type of Event that can occur.

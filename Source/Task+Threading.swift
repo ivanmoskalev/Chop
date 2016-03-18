@@ -8,8 +8,6 @@
 // See the LICENSE file for details.
 //
 
-import Foundation
-
 extension Task {
 
     @warn_unused_result
