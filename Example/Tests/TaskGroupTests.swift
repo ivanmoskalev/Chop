@@ -95,6 +95,28 @@ class TaskGroupTests: XCTestCase {
         XCTAssertEqual(taskTwoExecutionCnt, 1)
     }
 
+    func test_Cancel() {
+
+        var taskOneDisposeCnt = 0
+
+        Task<Int, NSError> { _ in
+                return { taskOneDisposeCnt++ }
+            }
+            .registerIn(group)
+
+        var taskTwoDisposeCnt = 0
+
+        Task<Int, NSError> { _ in
+                return { taskTwoDisposeCnt++ }
+            }
+            .registerIn(group)
+
+        group.cancel()
+
+        XCTAssertEqual(taskOneDisposeCnt, 1)
+        XCTAssertEqual(taskTwoDisposeCnt, 1)
+    }
+
     func test_IsFinished_ShouldAlwaysReturnFalse() {
         XCTAssertEqual(group.isFinished(), false)
     }

@@ -16,6 +16,9 @@ public protocol TaskType {
     /// Starts the execution of a task.
     func start()
 
+    /// Cancels the execution of a task.
+    func cancel()
+
     /// Returns whether the task is finished.
     func isFinished() -> Bool
 }

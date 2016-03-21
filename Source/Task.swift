@@ -76,8 +76,7 @@ public final class Task<Value, Error> : TaskType {
     }
 
     deinit {
-        // Call the user-provided dispose closure that frees the associated resources.
-        disposeHandler?()
+        cancel()
     }
 
 
@@ -107,6 +106,13 @@ public final class Task<Value, Error> : TaskType {
         disposeHandler = operation { [weak self] in
             self?.propagate($0)
         }
+    }
+
+    public func cancel() {
+        finished = true
+        subscriptions.removeAll()
+        disposeHandler?()
+        disposeHandler = nil
     }
 
     /**
