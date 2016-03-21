@@ -76,8 +76,7 @@ public final class Task<Value, Error> : TaskType {
     }
 
     deinit {
-        // Call the user-provided dispose closure that frees the associated resources.
-        disposeHandler?()
+        cancel()
     }
 
 
