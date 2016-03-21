@@ -148,4 +148,39 @@ class TaskTests: XCTestCase {
 
         XCTAssertEqual(ret, NSError(domain: "test", code: 404, userInfo: nil))
     }
+
+    func test_CancelIsSilent() {
+
+        let task = Task<Int, NSError> { handler in
+            handler(.Update(42))
+            return { handler(.Update(21)) }
+        }
+
+        var ret = 0
+
+        task
+            .onUpdate {
+                ret = $0
+            }
+            .registerIn(group)
+
+        task.cancel()
+
+        XCTAssertEqual(ret, 42)
+    }
+
+    func test_CancelDisposes() {
+
+        var disposeCnt = 0
+
+        let task = Task<Int, NSError> { handler in
+            handler(.Completion)
+            return { disposeCnt++ }
+        }
+
+        task.registerIn(group)
+        task.cancel()
+
+        XCTAssertEqual(disposeCnt, 1)
+    }
 }

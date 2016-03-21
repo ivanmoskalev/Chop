@@ -111,9 +111,9 @@ public final class Task<Value, Error> : TaskType {
 
     public func cancel() {
         finished = true
-        propagate(.Completion)
         subscriptions.removeAll()
         disposeHandler?()
+        disposeHandler = nil
     }
 
     /**
