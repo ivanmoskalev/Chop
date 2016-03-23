@@ -37,27 +37,18 @@ public final class Task<Value, Error> : TaskType {
     /// The lock that guards `emit`s.
     private var emitLock = NSRecursiveLock()
 
-
     //////////////////////////////////////////////////
     // Init / Deinit
 
     /**
      Creates a `Task` with a given closure.
-
-     - parameter operation: A closure that contains the work to be done.
-
-     - returns: An instance of `Task` ready for firing.
      */
     public init(operation: OperationType) {
         self.operation = operation
     }
 
     /**
-     Creates a `Task` that provides a value then completes.
-
-     - parameter value: The value that will be pushed to task's observers.
-
-     - returns: An instance of `Task`.
+     Creates a `Task` that emits a value and completes.
      */
     public convenience init(value: Value) {
         self.init {
@@ -67,10 +58,6 @@ public final class Task<Value, Error> : TaskType {
 
     /**
      Creates a `Task` that completes with an error.
-
-     - parameter value: The error that will be pushed to task's observers.
-
-     - returns: An instance of `Task`.
      */
     public convenience init(error: Error) {
         self.init {
@@ -78,20 +65,19 @@ public final class Task<Value, Error> : TaskType {
         }
     }
 
+    /**
+     By design, `deinit` cancels the task.
+     */
     deinit {
         cancel()
     }
 
 
     //////////////////////////////////////////////////
-    // Core
+    // Public
 
     /**
-     Allows the user to subscribe to the events that are pushed by the task.
-
-     - parameter sub: The closure in which task handling should take place.
-
-     - returns: The same task – to facilitate chaining.
+     Allows the user to subscribe to all events emitted by the task.
      */
     @warn_unused_result
     public func on(sub: EventType -> Void) -> Task<Value, Error> {
@@ -103,14 +89,16 @@ public final class Task<Value, Error> : TaskType {
      Starts the task if it is not started yet.
      */
     public func start() {
-        guard disposeHandler == nil else {
-            return
-        }
+        guard disposeHandler == nil else { return }
         disposeHandler = operation { [weak self] in
-            self?.propagate($0)
+            self?.emit($0)
         }
     }
 
+    /**
+     Silently cancels the task. No events are emitted. 
+     `disposeHandler` is called so that resources can be freed.
+     */
     public func cancel() {
         finished = true
         subscriptions.removeAll()
@@ -119,104 +107,53 @@ public final class Task<Value, Error> : TaskType {
     }
 
     /**
-     Inherited from `TaskType`.
-
-     - returns: Whether the task is finished (`.Completion` event has been pushed)
+     Inherited from `TaskType`. Returns `true` if task is finished (`.Completion` event has been pushed.)
      */
     public func isFinished() -> Bool {
         return finished
     }
 
-    /**
-     Propagates the event to subscribers, can fire side-effects.
 
-     - parameter event: The event which should be handled.
+    //////////////////////////////////////////////////
+    // Private
+
+    /**
+     Emits `event` to subscribers, can fire side-effects.
      */
-    private func propagate(event: EventType) {
+    private func emit(event: EventType) {
         emitLock.lock()
-        markFinishedIfCompletion(event)
+        completeIfFailure(event)
         for sub in self.subscriptions {
             sub(event)
         }
-        propagateCompletionIfFailure(event)
+        finishIfCompletion(event)
         emitLock.unlock()
     }
 
-    private func propagateCompletionIfFailure(event: EventType) {
+    /**
+     Additionaly emits a `.Completion` task if `event` is `.Failure`.
+     */
+    private func completeIfFailure(event: EventType) {
         switch event {
         case .Failure(_):
-            self.propagate(.Completion)
+            emit(.Completion)
         default:
             break
         }
     }
 
-    private func markFinishedIfCompletion(event: EventType) {
+    /**
+     Sets `finished` to `true` if `event` is `.Completion`.
+     */
+    private func finishIfCompletion(event: EventType) {
         switch event {
         case .Completion:
-            self.finished = true
+            finished = true
         default:
             break
         }
     }
 
-
-    //////////////////////////////////////////////////
-    // Convenience
-
-    /**
-     Allows the user to subscribe to the `.Update` events that are pushed by the task.
-
-     - parameter sub: The closure in which `.Update` event handling can take place.
-
-     - returns: The same task – to facilitate chaining.
-    */
-    @warn_unused_result
-    public func onUpdate(sub: Value -> Void) -> Task<Value, Error> {
-        return on { event in
-            switch event {
-            case .Update(let value):
-                sub(value)
-            default: break
-            }
-        }
-    }
-
-    /**
-     Allows the user to subscribe to the `.Failure` event that is pushed by the task.
-
-     - parameter sub: The closure in which `.Failure` event handling can take place.
-
-     - returns: The same task – to facilitate chaining.
-     */
-    @warn_unused_result
-    public func onFailure(sub: Error -> Void) -> Task<Value, Error> {
-        return on { event in
-            switch event {
-            case .Failure(let error):
-                sub(error)
-            default: break
-            }
-        }
-    }
-
-    /**
-     Allows the user to subscribe to the `.Completion` event that is pushed by the task.
-
-     - parameter sub: The closure in which `.Completion` event handling can take place.
-
-     - returns: The same task – to facilitate chaining.
-     */
-    @warn_unused_result
-    public func onCompletion(sub: Void -> Void) -> Task<Value, Error> {
-        return on { event in
-            switch event {
-            case .Completion:
-                sub()
-            default: break
-            }
-        }
-    }
 }
 
 
