@@ -34,6 +34,9 @@ public final class Task<Value, Error> : TaskType {
     /// Whether the task is finished.
     private var finished: Bool = false
 
+    /// The lock that guards `emit`s.
+    private var emitLock = NSRecursiveLock()
+
 
     //////////////////////////////////////////////////
     // Init / Deinit
@@ -130,11 +133,13 @@ public final class Task<Value, Error> : TaskType {
      - parameter event: The event which should be handled.
      */
     private func propagate(event: EventType) {
+        emitLock.lock()
         markFinishedIfCompletion(event)
         for sub in self.subscriptions {
             sub(event)
         }
         propagateCompletionIfFailure(event)
+        emitLock.unlock()
     }
 
     private func propagateCompletionIfFailure(event: EventType) {
