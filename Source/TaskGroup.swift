@@ -31,6 +31,7 @@ public final class TaskGroup : TaskType {
     /// The policy defining how to treat a new task with a conflicting identifier. For list of possible values see `Policy`.
     public let policy: Policy
 
+    /// The lock that protects `tasks` dictionary.
     private let tasksLock = NSRecursiveLock()
 
 
@@ -52,7 +53,7 @@ public final class TaskGroup : TaskType {
 
 
     //////////////////////////////////////////////////
-    // Core
+    // Public
 
     /**
     Registers a task in the group under given identifier. 
@@ -75,29 +76,30 @@ public final class TaskGroup : TaskType {
         tasksLock.unlock()
     }
 
-
-    //////////////////////////////////////////////////
-    // TaskType
-
     /**
-    Starts all the managed tasks, if they are not started already.
-    
-    If `startsImmediately` is true, this method is a de-facto no-op.
-    */
+     Starts all the managed tasks, if they are not started already.
+     If `startsImmediately` is true, this method is a de-facto no-op.
+     */
     public func start() {
         for (_, task) in tasks {
             task.start()
         }
     }
 
-    public func isFinished() -> Bool {
-        return false
-    }
-
+    /**
+     Silently cancels all managed tasks.
+     */
     public func cancel() {
         for (_, task) in tasks {
             task.cancel()
         }
+    }
+
+    /**
+     Always returns `false`.
+     */
+    public func isFinished() -> Bool {
+        return false
     }
 
 
@@ -105,7 +107,7 @@ public final class TaskGroup : TaskType {
     // Private
 
     /**
-    Removes all tasks that are finished, freeing up the resources.
+     Removes all tasks that are finished, freeing up the resources.
     */
     private func removeFinished() {
         tasksLock.lock()
@@ -115,11 +117,13 @@ public final class TaskGroup : TaskType {
         tasksLock.unlock()
     }
 
+    /**
+     Adds call to `removeFinished` on task completion.
+     */
     private func subscribeToCompletion(task: TaskType) {
-        if let task = task as? CompletionSubscribable {
-            task.onCompletion { [weak self] in
-                self?.removeFinished()
-            }
+        guard let task = task as? CompletionSubscribable else { return }
+        task.onCompletion { [weak self] in
+            self?.removeFinished()
         }
     }
 

@@ -107,7 +107,7 @@ public final class Task<Value, Error> : TaskType {
     }
 
     /**
-     Inherited from `TaskType`. Returns `true` if task is finished (`.Completion` event has been pushed.)
+     Returns `true` if task is finished (`.Completion` event has been pushed.)
      */
     public func isFinished() -> Bool {
         return finished
