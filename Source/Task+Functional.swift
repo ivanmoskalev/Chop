@@ -10,11 +10,19 @@
 
 extension Task {
 
+    /**
+     Returns a `Task` with values that are produced by applying `transform` to every yielded `.Update` event.
+     `transform` must return a transformed value.
+     */
     @warn_unused_result
     public func then<T>(transform: Value -> T) -> Task<T, Error> {
         return then { Task<T, Error>(value: transform($0)) }
     }
 
+    /**
+     Returns a `Task` with values that are produced by applying `transform` to every yielded `.Update` event.
+     `transform` must return an instance of `Task`.
+     */
     @warn_unused_result
     public func then<T>(transform: Value -> Task<T, Error>) -> Task<T, Error> {
         return Task<T, Error> { handler in
@@ -38,11 +46,19 @@ extension Task {
         }
     }
 
+    /**
+     Returns a `Task` with values that are produced by applying `transform` to every yielded `.Failure` event.
+     `transform` must return a value.
+     */
     @warn_unused_result
     public func recover(transform: Error -> Value) -> Task<Value, Error> {
         return recover { Task<Value, Error>(value: transform($0)) }
     }
 
+    /**
+     Returns a `Task` with values that are produced by applying `transform` to every yielded `.Failure` event.
+     `transform` must return an instance of `Task`.
+     */
     @warn_unused_result
     public func recover(transform: Error -> Task<Value, Error>) -> Task<Value, Error> {
         return Task<Value, Error> { handler in
