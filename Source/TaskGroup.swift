@@ -31,6 +31,8 @@ public final class TaskGroup : TaskType {
     /// The policy defining how to treat a new task with a conflicting identifier. For list of possible values see `Policy`.
     public let policy: Policy
 
+    private let tasksLock = NSRecursiveLock()
+
 
     //////////////////////////////////////////////////
     // Init
@@ -63,12 +65,14 @@ public final class TaskGroup : TaskType {
     - parameter taskId: Optional. The identifier of this task. Default value is an UUID string.
     */
     public func register(task: TaskType, taskId: String = NSUUID().UUIDString) {
+        tasksLock.lock()
         removeFinished()
         if policy == .Replace || tasks[taskId] == nil {
             tasks[taskId] = task
             subscribeToCompletion(task)
             if startsImmediately { task.start() }
         }
+        tasksLock.unlock()
     }
 
 
@@ -104,9 +108,11 @@ public final class TaskGroup : TaskType {
     Removes all tasks that are finished, freeing up the resources.
     */
     private func removeFinished() {
+        tasksLock.lock()
         for (key, task) in tasks where task.isFinished() {
             tasks[key] = nil
         }
+        tasksLock.unlock()
     }
 
     private func subscribeToCompletion(task: TaskType) {
