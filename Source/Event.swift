@@ -9,7 +9,7 @@
 //
 
 /**
- The events that can be dispatched by the task.
+ The events that can be emitted by the task.
  */
 public enum Event<V, E> {
     /// An update to yielded value. This can be a final or a non-final update.

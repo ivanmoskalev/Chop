@@ -10,6 +10,10 @@
 
 import Foundation
 
+/**
+ `TaskGroup` is a class representing an execution context for instances of `Task`.
+ `TaskGroup`s manage execution of tasks, disposing of those that are finished, and, optionally, enforcing uniqueness.
+ */
 public final class TaskGroup : TaskType {
 
     /**

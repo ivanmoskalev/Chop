@@ -8,6 +8,9 @@
 // See the LICENSE file for details.
 //
 
+/**
+ `Task` is a class representing an operation (potentially asynchronous) that can be subscribed to.
+*/
 public final class Task<Value, Error> : TaskType {
 
     /// The type of Event that can occur.
