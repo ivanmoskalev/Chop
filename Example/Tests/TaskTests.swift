@@ -189,14 +189,25 @@ class TaskTests: XCTestCase {
         var hitCnt = 0
 
         let task = Task<Int, NSError> { handler in
-            handler(.Failure(NSError(domain: "tst", code: 100, userInfo: nil)))
             hitCnt += 1
+            if hitCnt == 5 {
+                handler(.Update(42))
+                handler(.Completion)
+            }
+            else {
+                handler(.Failure(NSError(domain: "tst", code: 100, userInfo: nil)))
+            }
+
             return {}
         }
 
+        var value = 0
+
         task.retry(5)
+            .onUpdate { value = $0 }
             .registerIn(group)
 
-        XCTAssertEqual(hitCnt, 6)
+        XCTAssertEqual(hitCnt, 5)
+        XCTAssertEqual(value, 42)
     }
 }
