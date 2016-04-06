@@ -183,4 +183,20 @@ class TaskTests: XCTestCase {
 
         XCTAssertEqual(disposeCnt, 1)
     }
+
+    func test_Retry() {
+
+        var hitCnt = 0
+
+        let task = Task<Int, NSError> { handler in
+            handler(.Failure(NSError(domain: "tst", code: 100, userInfo: nil)))
+            hitCnt += 1
+            return {}
+        }
+
+        task.retry(5)
+            .registerIn(group)
+
+        XCTAssertEqual(hitCnt, 6)
+    }
 }
