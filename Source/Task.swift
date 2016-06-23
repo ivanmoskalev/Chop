@@ -116,6 +116,16 @@ public final class Task<Value, Error> : TaskType {
         return finished
     }
 
+    public func retry(times: UInt) -> Task<Value, Error> {
+        return recover { [weak self] error -> Task<Value, Error> in
+            guard let operation = self?.operation else { return Task(error: error) }
+            if times > 0 {
+                return Task(operation: operation).retry(times-1)
+            }
+            return Task(error: error)
+        }
+    }
+
 
     //////////////////////////////////////////////////
     // Private
