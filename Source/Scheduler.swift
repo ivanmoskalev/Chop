@@ -26,7 +26,7 @@ internal extension Scheduler {
         case .main:
             dispatchMain(block)
         case .background:
-            DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async(execute: block)
+            DispatchQueue.global(qos: .background).async(execute: block)
         }
     }
 

@@ -32,7 +32,7 @@ class TaskThreadingTests: XCTestCase {
         let expectation = self.expectation(description: "isMain")
 
         Task<String, NSError> { handler in
-                DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async(execute: {
+                DispatchQueue.global(qos: .background).async(execute: {
                     handler(.completion)
                 })
                 return {}
