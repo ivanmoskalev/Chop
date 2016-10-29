@@ -19,7 +19,7 @@ class TaskThreadingTests: XCTestCase {
         var hit = false
 
         Task<String, NSError>(value: "Test")
-            .switchTo(.Main)
+            .switchTo(.main)
             .onUpdate { _ in
                 hit = true
             }
@@ -29,31 +29,31 @@ class TaskThreadingTests: XCTestCase {
     }
 
     func test_MainFromBackground() {
-        let expectation = expectationWithDescription("isMain")
+        let expectation = self.expectation(description: "isMain")
 
         Task<String, NSError> { handler in
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-                    handler(.Completion)
+                DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async(execute: {
+                    handler(.completion)
                 })
                 return {}
             }
-            .switchTo(.Main)
+            .switchTo(.main)
             .onCompletion { _ in
-                if NSThread.isMainThread() {
+                if Thread.isMainThread {
                     expectation.fulfill()
                 }
             }
             .registerIn(group)
 
-        waitForExpectationsWithTimeout(10.0, handler: nil)
+        waitForExpectations(timeout: 10.0, handler: nil)
     }
 
     func test_Background() {
         var hitNow = false
-        let expectation = expectationWithDescription("background")
+        let expectation = self.expectation(description: "background")
 
         Task<String, NSError>(value: "Test")
-            .switchTo(.Background)
+            .switchTo(.background)
             .onUpdate { _ in
                 hitNow = true
                 expectation.fulfill()
@@ -61,7 +61,7 @@ class TaskThreadingTests: XCTestCase {
             .registerIn(group)
 
         XCTAssertFalse(hitNow)
-        waitForExpectationsWithTimeout(10.0, handler: nil)
+        waitForExpectations(timeout: 10.0, handler: nil)
     }
     
 }

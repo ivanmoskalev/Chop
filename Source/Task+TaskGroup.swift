@@ -12,7 +12,7 @@ public extension Task {
      Registers a task in a given `TaskGroup`.
      See `TaskGroup` for more detail.
      */
-    public func registerIn(group: TaskGroup, taskId: String? = nil) {
+    public func registerIn(_ group: TaskGroup, taskId: String? = nil) {
         guard let taskId = taskId else {
             group.register(self); return
         }

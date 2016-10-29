@@ -24,5 +24,5 @@ public protocol TaskType {
 }
 
 internal protocol CompletionSubscribable {
-    func onCompletion(sub: Void -> Void)
+    func onCompletion(_ sub: @escaping (Void) -> Void)
 }

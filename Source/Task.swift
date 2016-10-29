@@ -17,28 +17,28 @@ public final class Task<Value, Error> : TaskType {
     public typealias EventType = Event<Value, Error>
 
     /// The type of closure that disposes of any resources for task.
-    public typealias DisposeType = Void -> Void
+    public typealias DisposeType = (Void) -> Void
 
     /// The type of closure that performs the operation.
-    public typealias OperationType = (EventType -> Void) -> DisposeType
+    public typealias OperationType = (@escaping (EventType) -> Void) -> DisposeType
 
     /// The type of closure that describes the subscription.
-    public typealias SubscriptionType = EventType -> Void
+    public typealias SubscriptionType = (EventType) -> Void
 
     /// The operation that an instance of task wraps.
-    private let operation: OperationType
+    fileprivate let operation: OperationType
 
     /// An array of subscription closures for the result of operation.
-    private var subscriptions: [SubscriptionType] = []
+    fileprivate var subscriptions: [SubscriptionType] = []
 
     /// The handler that disposes of the task when it is not needed anymore.
-    private var disposeHandler: DisposeType?
+    fileprivate var disposeHandler: DisposeType?
 
     /// Whether the task is finished.
-    private var finished: Bool = false
+    fileprivate var finished: Bool = false
 
     /// The lock that guards `emit`s.
-    private var emitLock = NSRecursiveLock()
+    fileprivate var emitLock = NSRecursiveLock()
 
     //////////////////////////////////////////////////
     // Init / Deinit
@@ -46,7 +46,7 @@ public final class Task<Value, Error> : TaskType {
     /**
      Creates a `Task` with a given closure.
      */
-    public init(operation: OperationType) {
+    public init(operation: @escaping OperationType) {
         self.operation = operation
     }
 
@@ -55,7 +55,7 @@ public final class Task<Value, Error> : TaskType {
      */
     public convenience init(value: Value) {
         self.init {
-            $0(.Update(value)); $0(.Completion); return {}
+            $0(.update(value)); $0(.completion); return {}
         }
     }
 
@@ -64,7 +64,7 @@ public final class Task<Value, Error> : TaskType {
      */
     public convenience init(error: Error) {
         self.init {
-            $0(.Failure(error)); return {}
+            $0(.failure(error)); return {}
         }
     }
 
@@ -82,8 +82,8 @@ public final class Task<Value, Error> : TaskType {
     /**
      Allows the user to subscribe to all events emitted by the task.
      */
-    @warn_unused_result
-    public func on(sub: EventType -> Void) -> Task<Value, Error> {
+    
+    public func on(_ sub: @escaping (EventType) -> Void) -> Task<Value, Error> {
         subscriptions.append(sub)
         return self
     }
@@ -116,7 +116,7 @@ public final class Task<Value, Error> : TaskType {
         return finished
     }
 
-    public func retry(times: UInt) -> Task<Value, Error> {
+    public func retry(_ times: UInt) -> Task<Value, Error> {
         return recover { [weak self] error -> Task<Value, Error> in
             guard let operation = self?.operation else { return Task(error: error) }
             if times > 0 {
@@ -133,7 +133,7 @@ public final class Task<Value, Error> : TaskType {
     /**
      Emits `event` to subscribers, can fire side-effects.
      */
-    private func emit(event: EventType) {
+    fileprivate func emit(_ event: EventType) {
         emitLock.lock()
         completeIfFailure(event)
         for sub in self.subscriptions {
@@ -146,10 +146,10 @@ public final class Task<Value, Error> : TaskType {
     /**
      Additionaly emits a `.Completion` task if `event` is `.Failure`.
      */
-    private func completeIfFailure(event: EventType) {
+    fileprivate func completeIfFailure(_ event: EventType) {
         switch event {
-        case .Failure(_):
-            emit(.Completion)
+        case .failure(_):
+            emit(.completion)
         default:
             break
         }
@@ -158,9 +158,9 @@ public final class Task<Value, Error> : TaskType {
     /**
      Sets `finished` to `true` if `event` is `.Completion`.
      */
-    private func finishIfCompletion(event: EventType) {
+    fileprivate func finishIfCompletion(_ event: EventType) {
         switch event {
-        case .Completion:
+        case .completion:
             finished = true
         default:
             break
@@ -175,7 +175,7 @@ public final class Task<Value, Error> : TaskType {
 
 extension Task : CompletionSubscribable {
 
-    internal func onCompletion(sub: Void -> Void) {
+    internal func onCompletion(_ sub: @escaping (Void) -> Void) {
         let _ : Task<Value, Error> = self.onCompletion(sub)
     }
 

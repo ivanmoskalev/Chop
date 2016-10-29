@@ -13,8 +13,8 @@ extension Task {
     /**
      Returns a `Task` which emits events with threading strategy defined by `scheduler`.
      */
-    @warn_unused_result
-    public func switchTo(scheduler: Scheduler) -> Task<Value, Error> {
+    
+    public func switchTo(_ scheduler: Scheduler) -> Task<Value, Error> {
         return Task<Value, Error> { handler in
             var task: Task<Value, Error>? = self.on { event in
                 scheduler.perform {

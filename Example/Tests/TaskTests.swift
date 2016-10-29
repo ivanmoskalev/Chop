@@ -22,9 +22,9 @@ class TaskTests: XCTestCase {
         var retVal = 0
 
         let task = Task<Int, NSError> { handler in
-            invocationCount++;
-            handler(.Update(42))
-            handler(.Completion)
+            invocationCount += 1
+            handler(.update(42))
+            handler(.completion)
             return {}
         }
 
@@ -44,8 +44,8 @@ class TaskTests: XCTestCase {
 
     func test_FailureFlow() {
         let task = Task<Int, NSError> { handler in
-            handler(.Failure(NSError(domain: "test", code: 100, userInfo: nil)))
-            handler(.Completion)
+            handler(.failure(NSError(domain: "test", code: 100, userInfo: nil)))
+            handler(.completion)
             return {}
         }
 
@@ -56,10 +56,10 @@ class TaskTests: XCTestCase {
 
         task
             .onUpdate { _ in
-                onUpdateCnt++
+                onUpdateCnt += 1
             }
             .onFailure {
-                onFailureCnt++
+                onFailureCnt += 1
                 error = $0
             }
             .onCompletion {
@@ -76,10 +76,10 @@ class TaskTests: XCTestCase {
     func test_OnMultipleUpdates_shouldSaveLastValue() {
 
         let task = Task<String, NSError> { handler in
-            handler(.Update("How"))
-            handler(.Update("You"))
-            handler(.Update("Doin'?"))
-            handler(.Completion)
+            handler(.update("How"))
+            handler(.update("You"))
+            handler(.update("Doin'?"))
+            handler(.completion)
             return {}
         }
 
@@ -88,7 +88,7 @@ class TaskTests: XCTestCase {
 
         task
             .onUpdate {
-                onUpdateCnt++
+                onUpdateCnt += 1
                 retVal = $0
             }
             .registerIn(group)
@@ -102,8 +102,8 @@ class TaskTests: XCTestCase {
         var invocationCount = 0
 
         let task = Task<Void, NSError> { handler in
-            invocationCount++
-            handler(.Completion)
+            invocationCount += 1
+            handler(.completion)
             return {}
         }
 
@@ -111,7 +111,7 @@ class TaskTests: XCTestCase {
 
         task
             .onCompletion {
-                onCompletionCount++
+                onCompletionCount += 1
             }
             .registerIn(group)
 
@@ -152,8 +152,8 @@ class TaskTests: XCTestCase {
     func test_CancelIsSilent() {
 
         let task = Task<Int, NSError> { handler in
-            handler(.Update(42))
-            return { handler(.Update(21)) }
+            handler(.update(42))
+            return { handler(.update(21)) }
         }
 
         var ret = 0
@@ -174,8 +174,8 @@ class TaskTests: XCTestCase {
         var disposeCnt = 0
 
         let task = Task<Int, NSError> { handler in
-            handler(.Completion)
-            return { disposeCnt++ }
+            handler(.completion)
+            return { disposeCnt += 1 }
         }
 
         task.registerIn(group)
@@ -191,11 +191,11 @@ class TaskTests: XCTestCase {
         let task = Task<Int, NSError> { handler in
             hitCnt += 1
             if hitCnt == 5 {
-                handler(.Update(42))
-                handler(.Completion)
+                handler(.update(42))
+                handler(.completion)
             }
             else {
-                handler(.Failure(NSError(domain: "tst", code: 100, userInfo: nil)))
+                handler(.failure(NSError(domain: "tst", code: 100, userInfo: nil)))
             }
 
             return {}
@@ -217,7 +217,7 @@ class TaskTests: XCTestCase {
 
         let task = Task<Int, NSError> { handler in
             hitCnt += 1
-            handler(.Failure(NSError(domain: "tst", code: 100, userInfo: nil)))
+            handler(.failure(NSError(domain: "tst", code: 100, userInfo: nil)))
             return {}
         }
 

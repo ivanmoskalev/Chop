@@ -21,13 +21,13 @@ public final class TaskGroup : TaskType {
      */
     public enum Policy {
         /// The new task replaces the old one, terminating it.
-        case Replace
+        case replace
         /// The new task is ignored and terminated, if there are no other references to it.
-        case Ignore
+        case ignore
     }
 
     /// A dictionary of tasks retrievable by task identifiers.
-    private(set) var tasks = [String : TaskType]()
+    fileprivate(set) var tasks = [String : TaskType]()
 
     /// Whether the tasks should start immediately upon being added.
     public let startsImmediately: Bool
@@ -36,7 +36,7 @@ public final class TaskGroup : TaskType {
     public let policy: Policy
 
     /// The lock that protects `tasks` dictionary.
-    private let tasksLock = NSRecursiveLock()
+    fileprivate let tasksLock = NSRecursiveLock()
 
 
     //////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public final class TaskGroup : TaskType {
 
     - returns: An instance of `TaskGroup`.
     */
-    public init(policy: Policy = .Ignore, startsImmediately: Bool = true) {
+    public init(policy: Policy = .ignore, startsImmediately: Bool = true) {
         self.policy = policy
         self.startsImmediately = startsImmediately
     }
@@ -69,10 +69,10 @@ public final class TaskGroup : TaskType {
     - parameter task:   An object of `TaskType` to register.
     - parameter taskId: Optional. The identifier of this task. Default value is an UUID string.
     */
-    public func register(task: TaskType, taskId: String = NSUUID().UUIDString) {
+    public func register(_ task: TaskType, taskId: String = UUID().uuidString) {
         tasksLock.lock()
         removeFinished()
-        if policy == .Replace || tasks[taskId] == nil {
+        if policy == .replace || tasks[taskId] == nil {
             tasks[taskId] = task
             subscribeToCompletion(task)
             if startsImmediately { task.start() }
@@ -113,7 +113,7 @@ public final class TaskGroup : TaskType {
     /**
      Removes all tasks that are finished, freeing up the resources.
     */
-    private func removeFinished() {
+    fileprivate func removeFinished() {
         tasksLock.lock()
         for (key, task) in tasks where task.isFinished() {
             tasks[key] = nil
@@ -124,7 +124,7 @@ public final class TaskGroup : TaskType {
     /**
      Adds call to `removeFinished` on task completion.
      */
-    private func subscribeToCompletion(task: TaskType) {
+    fileprivate func subscribeToCompletion(_ task: TaskType) {
         guard let task = task as? CompletionSubscribable else { return }
         task.onCompletion { [weak self] in
             self?.removeFinished()

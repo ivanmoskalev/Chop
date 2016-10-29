@@ -13,9 +13,9 @@
  */
 public enum Event<V, E> {
     /// An update to yielded value. This can be a final or a non-final update.
-    case Update(_: V)
+    case update(_: V)
     /// A faiulre. Automatically triggers `.Completion` after being dispatched.
-    case Failure(_: E)
+    case failure(_: E)
     /// The completion – it means that the task is finished and can be disposed of.
-    case Completion
+    case completion
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0720"
+   LastUpgradeVersion = "0800"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -42,7 +42,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D870EF954842885BAA0B50BB86A82B50"
+               BlueprintIdentifier = "EDD911E2843DD2960FCD77380F2C2C00"
                BuildableName = "Chop.framework"
                BlueprintName = "Chop"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">

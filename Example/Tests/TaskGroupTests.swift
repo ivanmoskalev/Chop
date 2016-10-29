@@ -20,8 +20,8 @@ class TaskGroupTests: XCTestCase {
         var taskOneExecutionCnt = 0
 
         Task<Int, NSError> {
-            taskOneExecutionCnt++
-            $0(.Update(1))
+            taskOneExecutionCnt += 1
+            $0(.update(1))
             return {}
         }
         .registerIn(group, taskId: "task")
@@ -29,8 +29,8 @@ class TaskGroupTests: XCTestCase {
         var taskTwoExecutionCnt = 0
 
         Task<Int, NSError> {
-            taskTwoExecutionCnt++
-            $0(.Completion)
+            taskTwoExecutionCnt += 1
+            $0(.completion)
             return {}
         }
         .registerIn(group, taskId: "task")
@@ -41,21 +41,21 @@ class TaskGroupTests: XCTestCase {
 
     func test_ReplacePolicy() {
 
-        group = TaskGroup(policy: .Replace)
+        group = TaskGroup(policy: .replace)
 
         var taskOneDisposeCnt = 0
 
         Task<Int, NSError> {
-            $0(.Completion)
-            return { taskOneDisposeCnt++ }
+            $0(.completion)
+            return { taskOneDisposeCnt += 1 }
         }
         .registerIn(group, taskId: "task")
 
         var taskTwoExecutionCnt = 0
 
         Task<Int, NSError> {
-            taskTwoExecutionCnt++
-            $0(.Completion)
+            taskTwoExecutionCnt += 1
+            $0(.completion)
             return {}
         }
         .registerIn(group, taskId: "task")
@@ -71,8 +71,8 @@ class TaskGroupTests: XCTestCase {
         var taskOneExecutionCnt = 0
 
         Task<Int, NSError> {
-            taskOneExecutionCnt++
-            $0(.Update(1))
+            taskOneExecutionCnt += 1
+            $0(.update(1))
             return {}
         }
         .registerIn(group)
@@ -80,8 +80,8 @@ class TaskGroupTests: XCTestCase {
         var taskTwoExecutionCnt = 0
 
         Task<Int, NSError> {
-            taskTwoExecutionCnt++
-            $0(.Completion)
+            taskTwoExecutionCnt += 1
+            $0(.completion)
             return {}
         }
         .registerIn(group)
@@ -100,14 +100,14 @@ class TaskGroupTests: XCTestCase {
         var taskOneDisposeCnt = 0
 
         Task<Int, NSError> { _ in
-                return { taskOneDisposeCnt++ }
+                return { taskOneDisposeCnt += 1 }
             }
             .registerIn(group)
 
         var taskTwoDisposeCnt = 0
 
         Task<Int, NSError> { _ in
-                return { taskTwoDisposeCnt++ }
+                return { taskTwoDisposeCnt += 1 }
             }
             .registerIn(group)
 
