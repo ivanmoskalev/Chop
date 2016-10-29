@@ -1,0 +1,10 @@
+comment:
+  layout: header, changes, diff
+coverage:
+  ignore:
+  - Example/.*
+  status:
+    patch:
+      default:
+        target: '80'
+    project: false
