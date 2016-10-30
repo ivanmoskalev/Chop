@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Chop"
-  s.version          = "0.2.0"
+  s.version          = "0.3.0"
   s.summary          = "Expressive RAII abstraction over async operations."
   s.description      = <<-DESC
                         Chop is a delightful framework that provides a simple and expressive way to manage async operations.
