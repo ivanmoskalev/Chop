@@ -2,7 +2,7 @@ comment:
   layout: header, changes, diff
 coverage:
   ignore:
-  - Example/.*
+  - test/ChopExample/.*
   status:
     patch:
       default:

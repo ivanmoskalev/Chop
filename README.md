@@ -10,10 +10,10 @@ Write synchronous, testable core easily with Chop.
 
 ## What is Chop?
 
-Chop is a Swift microframework providing a simple  implementations of async ***tasks*** and ***task groups***.
+Chop is a Swift microframework providing implementations of ***tasks*** and ***task groups***.
 
-- **Tasks** are abstractions over asynchronous processes that can yield several values during their lifetime (think of progressive images or cached-then-remote values). They can also finish with an error. Tasks are lazy – which means they are not started before they really need to. Furthermore, tasks are cancelled when they are no longer referenced (ie, deallocated), freeing up jobs and resources they are associated with.
-- **Task Groups** are execution contexts for tasks. They allow to place uniqueness constraints on tasks and apply a variety of behaviors around that (for example, replacing existing task with the same unique ID with the new one or ignoring the latter). Task Groups also free up all tasks they manage when they are deallocated, making them a nice way to particular tasks to, say, user interface. 
+- **Tasks** are abstractions over asynchronous processes that can yield several values during their lifetime (think of progressive images or cached-then-remote values). They can also finish with an error. Tasks are lazy – which means they are not started before they really need to. Furthermore, tasks are cancelled when they are no longer referenced (i.e. deallocated), freeing up resources they are associated with.
+- **Task Groups** are execution contexts for tasks. They allow to place uniqueness constraints on tasks and apply a variety of behaviors around that. Task Groups also free up all tasks they manage when they are deallocated, making them a nice way to tie particular tasks to, say, user interface. 
 
 Here is a small example of how Chop can be used to execute a task that progressively loads a collection of items (for example, first fetching the locally cached value, and then the remote value). Only one task is allowed to execute; subsequent similar tasks are ignored until the first one finishes:
 ```swift
@@ -21,34 +21,58 @@ Here is a small example of how Chop can be used to execute a task that progressi
 // `policy` describes what should be done if a task with an identical `taskId` is added to group.
 // In this case we want to ignore subsequent tasks with the same `taskId` until the first is completed.
 // Other options exist.
-let taskGroup = TaskGroup(policy: .Ignore)
+let taskGroup = TaskGroup(policy: .ignore)
 
 self.isLoading = true
 self.interactor
-    .fetchIssues(request, itemLimit: 10, progressive: true) // API that exposes a Chop'esque interface.
-    .onUpdate { [weak self] in
-      // Can be executed multiple times (ie., providing first cached items, then remote items).
-      self.items = $0
-    }
-    .onFailure { [weak self] in
-      // Executed only once if error occurs.
-      self.handleError($0)  
-    }
-    .onCompletion { [weak self] in
-      // Executed when the task has finished, regardless of result.
-      self.isLoading = false 
-    }
-    // `taskId` is optional. If provided, task will be uniqued based on this id.
-    .registerIn(self.taskGroup, taskId: "itemFetch")
+  .fetchIssues(request, itemLimit: 10, progressive: true) // API that exposes a Chop'esque interface.
+  .onUpdate { [weak self] in
+    // Can be executed multiple times (i.e. providing first cached items, then remote items).
+    self?.items = $0
+  }
+  .onFailure { [weak self] in
+    // Executed only once if error occurs.
+    self?.handleError($0)  
+  }
+  .onCompletion { [weak self] in
+    // Executed when the task has finished, regardless of result.
+    self?.isLoading = false 
+  }
+  // `taskId` is optional - it will be 
+  .registerIn(self.taskGroup, taskId: "itemFetch")
 ```
 
-Imagine how much boilerplate code would you have to write to acheive this behavior. With `Chop` it is easy, declarative and rather enjoyable. 
+The task is created like this:
 
-The task performs work only as long as it is referenced by a `TaskGroup`. Consequently, if the `TaskGroup` is destroyed, all managed tasks are interrupted and you don't have to care about them anymore. 
+```swift
+func fetchIssues(request: IssueRequest, itemLimit: UInt, progressive: Bool) -> Task<[Issue]> {
+  return Task {
+    let localItems = self.localDB.getItems(request)
+    // Send local items through to the Task subscribers.
+    $0(.update(localItems))
+    
+    // The following operation is asynchronous.
+    var urlSessionTask = self.httpClient.getItems(request) { result in
+      switch result {
+        // Once again send data through to the Task subscribers.
+        case .Success(let issues): $0(.update(issues))
+        // Or, otherwise, send error.
+        case .Failure(let error):  $0(.error(localResponse))
+      }
+      $0(.completion)
+    }
+    
+    // In this closure we perform cleanup. It will be called if the task is finished or cancelled.
+    return { urlSessionTask.cancel(); urlSessionTask = nil }
+  }
+}
+```
+
+The task performs work only as long as it is referenced by a `TaskGroup`. Consequently, if the `TaskGroup` is destroyed, all managed tasks are interrupted and you don't have to care about them anymore. This can be useful if you want to tie the lifetime of the task 
 
 ## Requirements
 
-`Chop` requires Swift 2.0.
+`Chop` requires Swift 3.2. Swift 4 is supported as well.
 
 ## Installation
 
@@ -60,7 +84,7 @@ pod "Chop"
 
 ## Author
 
-Ivan Moskalev, ivan.moskalev@gmail.com
+Ivan Moskalev, iv.s.moskalev@gmail.com
 
 ## License
 
