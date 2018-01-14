@@ -1,18 +1,18 @@
 language: objective-c
-osx_image: xcode8
+osx_image: xcode9
 
 rvm: 2.2
 cache: cocoapods
-podfile: Example/Podfile 
+podfile: test/Podfile 
 
 install:
  - gem install xcpretty
  - gem install xcpretty-travis-formatter
  - gem install cocoapods # Since Travis is not always on latest version
- - pod install --no-repo-update --project-directory=Example
+ - pod install --no-repo-update --project-directory=test
  
 script:
- - set -o pipefail && xcodebuild test -workspace Example/Chop.xcworkspace -scheme Chop-Example -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=10.0' | xcpretty -f `xcpretty-travis-formatter`
+ - set -o pipefail && xcodebuild test -workspace test/Chop.xcworkspace -scheme ChopTests -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=10.0' | xcpretty -f `xcpretty-travis-formatter`
  - pod lib lint
 
 after_success:
