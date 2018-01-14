@@ -55,9 +55,9 @@ func fetchIssues(request: IssueRequest, itemLimit: UInt, progressive: Bool) -> T
     var urlSessionTask = self.httpClient.getItems(request) { result in
       switch result {
         // Once again send data through to the Task subscribers.
-        case .Success(let issues): $0(.update(issues))
+        case .success(let issues): $0(.update(issues))
         // Or, otherwise, send error.
-        case .Failure(let error):  $0(.error(localResponse))
+        case .failure(let error):  $0(.error(localResponse))
       }
       $0(.completion)
     }
@@ -68,7 +68,7 @@ func fetchIssues(request: IssueRequest, itemLimit: UInt, progressive: Bool) -> T
 }
 ```
 
-The task performs work only as long as it is referenced by a `TaskGroup`. Consequently, if the `TaskGroup` is destroyed, all managed tasks are interrupted and you don't have to care about them anymore. This can be useful if you want to tie the lifetime of the task 
+The task performs work only as long as it is referenced by a `TaskGroup`. Consequently, if the `TaskGroup` is destroyed, all managed tasks are interrupted and you don't have to care about them anymore.
 
 ## Requirements
 
